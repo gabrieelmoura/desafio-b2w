@@ -17,6 +17,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,10 +46,13 @@ public class WorldEndpointsTests {
 
     @Test
     public void createsNewPlanet() throws URISyntaxException {
-        World world = new World("Yavin IV", "jungle, rainforests", "jungle, rainforests");
-        RequestEntity<World> requestEntity = RequestEntity
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("name", "Yavin IV");
+        map.add("climate", "temperate, tropical");
+        map.add("terrain", "jungle, rainforests");
+        RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
                 .post(new URI("http://localhost:" + port + "/world"))
-                .body(world);
+                .body(map);
         ResponseEntity<Object> responseEntity = this.rest.exchange(requestEntity, Object.class);
         Assert.assertEquals(201, responseEntity.getStatusCodeValue());
         List<World> worlds = this.mongo.find(new Query(Criteria.where("name").is("Yavin IV")), World.class);
